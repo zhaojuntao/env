@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 #
-# File      : vars.py
+# File      : cmds.py
 # This file is part of RT-Thread RTOS
 # COPYRIGHT (C) 2006 - 2018, RT-Thread Development Team
 #
@@ -23,15 +23,4 @@
 # 2018-5-28      SummerGift      Add copyright information
 #
 
-import sys
-
-env_vars = {}
-
-def Export(var):
-    f = sys._getframe(1).f_locals
-    env_vars[var] = f[var]
-    print("env_vars:%s"%env_vars)
-
-def Import(var):
-    print("env_vars:%s"%env_vars)
-    return env_vars[var]
+__all__ = ['env', 'archive', 'kconfig']

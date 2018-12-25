@@ -35,20 +35,27 @@ __version__ = 'rt-thread packages v1.0.0'
 
 
 def init_argparse():
+    print("In init argparse")
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers()
+    print("===> 1")
 
     parser.add_argument('-v', '--version',
                         action='version', version=__version__)
 
+    print("===> 2")
     cmd_system.add_parser(subs)
+    print("===> 3")
     cmd_menuconfig.add_parser(subs)
+    print("===> 4")
     cmd_package.add_parser(subs)
+    print("===> 5")
 
     return parser
 
 
 def main():
+    print("In env main()")
     bsp_root = os.getcwd()
     script_root = os.path.split(os.path.realpath(__file__))[0]
     env_root = os.getenv("ENV_ROOT")
@@ -60,12 +67,17 @@ def main():
 
     sys.path = sys.path + [os.path.join(script_root)]
 
+    print("env root: %s"%env_root)
+
     Export('env_root')
     Export('bsp_root')
 
-    parser = init_argparse()
-    args = parser.parse_args()
-    args.func(args)
+    # parser = init_argparse()
+    # print("===> 6.1")
+    # args = parser.parse_args()
+    # print("===> 6.2")
+    # args.func(args)
+    # print("===> 6")
 
 
 if __name__ == '__main__':

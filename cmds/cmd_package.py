@@ -364,7 +364,13 @@ def package_list():
     and list the version number of the selected package.
     """
     fn = '.config'
-    env_root = Import('env_root')
+    # env_root = Import('env_root')
+    env_root = os.getenv("ENV_ROOT")
+    if env_root == None:
+        if platform.system() != 'Windows':
+            env_root = os.path.join(os.getenv('HOME'), '.env')
+        else:
+            env_root = os.path.join(os.getenv('USERPROFILE'), '.env')
 #     bsp_root = Import('bsp_root')
 #     target_pkgs_path = os.path.join(bsp_root, 'packages')
 #     pkgs_fn = os.path.join(target_pkgs_path, 'pkgs.json')
@@ -468,7 +474,13 @@ def update_latest_packages(pkgs_fn, bsp_packages_path):
     message provided by git.
     """
 
-    env_root = Import('env_root')
+    # env_root = Import('env_root')
+    env_root = os.getenv("ENV_ROOT")
+    if env_root == None:
+        if platform.system() != 'Windows':
+            env_root = os.path.join(os.getenv('HOME'), '.env')
+        else:
+            env_root = os.path.join(os.getenv('USERPROFILE'), '.env')
 
     env_kconfig_path = os.path.join(env_root, 'tools\scripts\cmds')
     env_config_file = os.path.join(env_kconfig_path, '.config')
@@ -529,9 +541,11 @@ def update_latest_packages(pkgs_fn, bsp_packages_path):
 
 def pre_package_update():
 
-    bsp_root = Import('bsp_root')
+    # bsp_root = Import('bsp_root')
+    bsp_root = r"D:\Git\rt-thread\bsp\qemu-vexpress-a9"
 
-    if not os.path.exists('.config'):
+    if not os.path.exists(os.path.join(bsp_root, '.config')):
+        print "===> 1212"
         print (
             "Can't find file .config.Maybe your working directory isn't in bsp root now.")
         print ("if your working directory isn't in bsp root now,please change your working directory to bsp root.")
@@ -540,17 +554,17 @@ def pre_package_update():
 
     bsp_packages_path = os.path.join(bsp_root, 'packages')
     if not os.path.exists(bsp_packages_path):
-        os.mkdir("packages")
-        os.chdir(bsp_packages_path)
-        fp = open("pkgs.json", 'w')
+        os.mkdir(bsp_packages_path)
+        # os.chdir(bsp_packages_path)
+        fp = open(os.path.join(bsp_packages_path, "pkgs.json"), 'w')
         fp.write("[]")
         fp.close()
 
-        fp = open("pkgs_error.json", 'w')
+        fp = open(os.path.join(bsp_packages_path, "pkgs_error.json"), 'w')
         fp.write("[]")
         fp.close()
 
-        os.chdir(bsp_root)
+        # os.chdir(bsp_root)
 
     # prepare target packages file
     dbsqlite_pathname = os.path.join(bsp_packages_path, 'packages.dbsqlite')
@@ -614,8 +628,15 @@ def pre_package_update():
 
 
 def error_packages_handle(error_packages_list, read_back_pkgs_json, pkgs_fn):
-    bsp_root = Import('bsp_root')
-    env_root = Import('env_root')
+    # bsp_root = Import('bsp_root')
+    bsp_root = r"D:\Git\rt-thread\bsp\qemu-vexpress-a9"
+    # env_root = Import('env_root')
+    env_root = os.getenv("ENV_ROOT")
+    if env_root == None:
+        if platform.system() != 'Windows':
+            env_root = os.path.join(os.getenv('HOME'), '.env')
+        else:
+            env_root = os.path.join(os.getenv('USERPROFILE'), '.env')
 
     flag = None
 
@@ -739,10 +760,20 @@ def package_update(isDeleteOld=False):
     """
 
     pkgs_update_log = Logger('pkgs_update', logging.WARNING)
-    bsp_root = Import('bsp_root')
-    env_root = Import('env_root')
+    bsp_root = r"D:\Git\rt-thread\bsp\qemu-vexpress-a9" # Import('bsp_root')
+
+    env_root = os.getenv("ENV_ROOT")
+    if env_root == None:
+        if platform.system() != 'Windows':
+            env_root = os.path.join(os.getenv('HOME'), '.env')
+        else:
+            env_root = os.path.join(os.getenv('USERPROFILE'), '.env')
+
+
+    # env_root = # Import('env_root')
     flag = True
     sys_value = pre_package_update()
+    print("sys value: %s"%sys_value)
     oldpkgs = sys_value[0]
     newpkgs = sys_value[1]
     pkgs_delete_error_list = sys_value[2]
@@ -750,6 +781,8 @@ def package_update(isDeleteOld=False):
     pkgs_error_list_fn = sys_value[4]
     bsp_packages_path = sys_value[5]
     dbsqlite_pathname = sys_value[6]
+
+    print("===> 11")
 
     pkgs_update_log.info(
         '[Line: %d][Message : Begin to remove packages]' % sys._getframe().f_lineno)
@@ -759,6 +792,8 @@ def package_update(isDeleteOld=False):
         '[Line: %d][Message : newpkgs: %s ]' % (sys._getframe().f_lineno, newpkgs))
     pkgs_update_log.info(
         '[Line: %d][Message : pkgs_delete_error_list: %s ]' % (sys._getframe().f_lineno, pkgs_delete_error_list))
+
+    print("===> 12")
 
     if len(pkgs_delete_error_list):
         for error_package in pkgs_delete_error_list:
@@ -772,6 +807,8 @@ def package_update(isDeleteOld=False):
                 if rm_package(removepath_ver) == False:
                     print("Error: Delete package %s failed! Please delete the folder manually.\n"%error_package['name'])
                     return
+
+    print("===> 13")
 
     # 1.in old ,not in new : Software packages that need to be removed.
     casedelete = sub_list(oldpkgs, newpkgs)
@@ -960,8 +997,15 @@ def package_wizard():
 
 def upgrade_packages_index():
     """Update the package repository index."""
-    
-    env_root = Import('env_root')
+
+    env_root = os.getenv("ENV_ROOT")
+    if env_root == None:
+        if platform.system() != 'Windows':
+            env_root = os.path.join(os.getenv('HOME'), '.env')
+        else:
+            env_root = os.path.join(os.getenv('USERPROFILE'), '.env')
+
+    # env_root = Import('env_root')
     env_kconfig_path = os.path.join(env_root, 'tools\scripts\cmds')
     env_config_file = os.path.join(env_kconfig_path, '.config')
     if os.path.isfile(env_config_file) and find_macro_in_config(env_config_file, 'SYS_PKGS_DOWNLOAD_ACCELERATE'):
@@ -1007,7 +1051,16 @@ def upgrade_env_script():
     """Update env function scripts."""
 
     print("Begin to upgrade env scripts.")
-    env_root = Import('env_root')
+
+    env_root = os.getenv("ENV_ROOT")
+    if env_root == None:
+        if platform.system() != 'Windows':
+            env_root = os.path.join(os.getenv('HOME'), '.env')
+        else:
+            env_root = os.path.join(os.getenv('USERPROFILE'), '.env')
+
+
+    # env_root = Import('env_root')
     env_kconfig_path = os.path.join(env_root, 'tools\scripts\cmds')
     env_config_file = os.path.join(env_kconfig_path, '.config')
     if os.path.isfile(env_config_file) and find_macro_in_config(env_config_file, 'SYS_PKGS_DOWNLOAD_ACCELERATE'):
@@ -1030,7 +1083,7 @@ def upgrade_env_script():
 
 def package_upgrade():
     """Update the package repository directory and env function scripts."""
-    
+    print("In package upgrade")
     upgrade_packages_index()
     upgrade_env_script()
 
